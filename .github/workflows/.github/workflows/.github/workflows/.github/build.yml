@@ -1,0 +1,25 @@
+ name: Build PS3 PKG
+on:
+  workflow_dispatch:
+  push:
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    container: ghcr.io/altps3/ps3dev:latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Descompactar
+        run: |
+          (apt-get update -y && apt-get install -y unzip) || true
+          unzip -o buckshot_ps3_v0.2.zip
+      - name: Ambiente
+        run: echo "PS3DEV=$PS3DEV PSL1GHT=$PSL1GHT"
+      - name: Compilar
+        working-directory: buckshot_ps3
+        run: make pkg
+      - uses: actions/upload-artifact@v4
+        with:
+          name: buckshot-ps3
+          path: |
+            buckshot_ps3/*.pkg
+            buckshot_ps3/*.self
